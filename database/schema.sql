@@ -28,15 +28,15 @@ CREATE TABLE IF NOT EXISTS fontes_emissao (
 CREATE TABLE IF NOT EXISTS historico_consumo (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     
-    id_fonte INTEGER NOT NULL, 
+    fonte_id INTEGER NOT NULL, 
     quantidade REAL NOT NULL, 
     tco2_eq REAL NOT NULL,
     mes_ref INTEGER NOT NULL, 
     ano_ref INTEGER NOT NULL,
     registrado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (id_fonte) REFERENCES fontes_emissao(id),
-        UNIQUE (id_fonte, mes_ref, ano_ref)
+    FOREIGN KEY (fonte_id) REFERENCES fontes_emissao(id),
+        UNIQUE (fonte_id, mes_ref, ano_ref)
 );
 
 CREATE TABLE IF NOT EXISTS fatores_emissao(
