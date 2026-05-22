@@ -50,11 +50,11 @@ CREATE TABLE IF NOT EXISTS fatores_emissao(
 
 -- Fatores MCTI iniciais
 INSERT OR IGNORE INTO fatores_emissao (tipo_fonte, fator_conversao, unidade) VALUES
-    ('energia_eletrica', 0.0289, 'tCO2/MWh'),
-    ('diesel',           2.603,  'kgCO2e/L'),
-    ('gasolina',         2.212,  'kgCO2e/L'),
-    ('glp',              1.578,  'kgCO2e/kg'),
-    ('residuos',         0.5,    'tCO2e/t');
-
+    ('energia_eletrica', 0.0289,    'tCO2e/MWh'),
+    ('diesel',           0.002603,  'tCO2e/L'),
+    ('gasolina',         0.002212,  'tCO2e/L'),
+    ('etanol',           0.001457,  'tCO2e/L'),
+    ('glp',              0.001578,  'tCO2e/kg'),
+    ('residuos',         0.5,       'tCO2e/t');
 
 

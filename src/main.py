@@ -1,12 +1,4 @@
-from database import conectar
+from database import criar_banco
 
-connect = conectar()
-
-with open("database/schema.sql", "r", encoding ="utf-8") as arquivo:
-    sql = arquivo.read()
-
-connect.executescript(sql)
-
-print("Banco criado")
-
-connect.close()
+criar_banco()
+print("Banco iniciado com sucesso.")
