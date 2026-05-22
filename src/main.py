@@ -2,6 +2,9 @@ from database import criar_banco
 from empresa import cadastrar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
 
+criar_banco()
+print("Banco iniciado com sucesso.")
+
 def menu_fontes(empresa_id):
     while True:
         print("\n___Fontes de Emissão___")
@@ -64,5 +67,9 @@ def menu_principal(empresa_id):
 
 
         
+
+
+
+
 
 
