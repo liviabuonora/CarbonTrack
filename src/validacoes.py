@@ -1,28 +1,12 @@
-import os
-os.system("cls")
+TIPOS_VALIDOS = ["energia_eletrica", "diesel", "gasolina", "etanol", "glp", "residuos"]
 
-empresas = []
-consumos = []
+def validar_cnpj_duplicado(conn, cnpj ):
+    cursor = conn.execute("SELECT id FROM empresas WHERE cnpj = ?", (cnpj,))
+    return cursor.fetchone() is not None
 
-#Cadastro da empresa
+def validar_empresa_existe( conn, empresa_id):
+    cursor = conn.execute("SELECT id FROM empresas WHERE id = ?", (empresa_id,))
+    return cursor.fetchone() is not None
 
-cnpj = input("Digite o CNPJ da empresa: ")
-
-if cnpj in empresas:
-    print("Erro: CNPJ já cadastrado.")
-else:
-    empresas.append(cnpj)
-    print("Empresa cadastrada com sucesso.")
-
-#Registro de consumos
-
-mes = input("Digite o mês: ")
-fonte = input("Digite a fonte do consumo: ")
-
-registro = (mes, fonte)
-
-if registro in consumos:
-    print("Erro: consumo já registrado.")
-else:
-    consumos.append(registro)
-    print("Consumo registrado com sucesso.")
+def validar_tipo_fonte(tipo):
+    return tipo in TIPOS_VALIDOS
