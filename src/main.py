@@ -1,5 +1,5 @@
 from database import criar_banco, conectar
-from empresa import cadastrar_empresa
+from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
 from validacoes import TIPOS_VALIDOS
 def menu_fontes(conn, empresa_id):
@@ -78,7 +78,8 @@ def menu_principal(conn):
         print("         CARBON TRACK PME          ")
         print("===================================")
         print("[1] Cadastre sua empresa")
-        print("[2] Gerencie suas fontes de emissão")
+        print("[2] Listar empresas")
+        print("[3] Gerencie suas fontes de emissão")
         print("[0] Sair")
 
         try:    
@@ -88,9 +89,15 @@ def menu_principal(conn):
             continue
         
         if opcao == 1:
-            cadastrar_empresa(conn)
+            razao_social = input("Razão social: ").strip()
+            cnpj = input("CNPJ: ").strip()
+            setor = input("Setor: ").strip()   
+            cadastrar_empresa(conn, razao_social, cnpj, setor)
 
         elif opcao == 2:
+            listar_empresas(conn)
+        
+        elif opcao == 3:
             try:
                 empresa_id = int(input("Insira o ID da empresa:"))
             except ValueError:
