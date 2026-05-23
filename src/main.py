@@ -1,46 +1,64 @@
-from database import criar_banco
+from database import criar_banco, conectar
 from empresa import cadastrar_empresa
-from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
+from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte, TIPOS_VALIDOS
 
-criar_banco()
-print("Banco iniciado com sucesso.")
-
-def menu_fontes(empresa_id):
+def menu_fontes(conn, empresa_id):
     while True:
-        print("\n___Fontes de Emissão___")
+        print("\n----Fontes de Emissão----")
         print("[1] Cadastrar nova fonte")
         print("[2] Listar fontes ativas")
         print("[3] Editar fonte")
         print("[4] Desativar fonte")
         print("[5] Voltar")
 
-        opcao = input("\nEscolha: ").strip()
+        opcao = int(input("\nEscolha: "))
 
+        if opcao == 1:
+            nome = input("Nome da fonte: ").strip()
+            print("Tipos disponíveis:")
+            for t in TIPOS_VALIDOS:
+                print(" -", t)
+            tipo = input("Tipo: ").strip()
+            unidade = input("Unidade (ex: L, kWh, kg, t): ").strip()
+            cadastrar_fonte(conn, empresa_id, nome, tipo, unidade)
         
-        if opcao == "3":
+        elif opcao == 2:
+            listar_fontes(conn, empresa_id)
+        
+        elif opcao == 3:
+            listar_fontes(conn, empresa_id)
+            fonte_id = int(input("\nInsira o ID da fonte que deseja alterar (ou 0 para cancelar): "))
+            if fonte_id == 0:
+                print("Operação cancelada.")
+            else:
+                novo_nome = input("Insira o novo nome da fonte: ").strip()
+                print("Tipos disponíveis:")
+                for t in TIPOS_VALIDOS:
+                    print(" -", t)
+                novo_tipo = input("Insira o novo tipo da fonte: ").strip()
+                nova_unidade = input("Insira a nova unidade: ").strip()
+                editar_fonte(conn, fonte_id, novo_nome, novo_tipo, nova_unidade)
 
+        elif opcao == 4:
             listar_fontes(empresa_id)
 
-            fonte_id = int(input("Insira o ID da fonte que deseja alterar: "))
-            novo_nome = input("Insira o novo nome da fonte: ").strip()
-            novo_tipo = input("Insira o novo tipo da fonte: ").strip()
-            unidade = input("Insira a unidade: ").strip()
-            editar_fonte(fonte_id,novo_nome,novo_tipo,unidade)
+            fonte_id = int(input("Insira o ID da fonte que deseja desativar (ou 0 para cancelar): "))
+            if fonte_id == 0:
+                print("Operação cancelada")
+            else:
+                confirma = input("Tem certeza? (s/n): ").strip()
+                if confirma.lower() == "s":
+                    desativar_fonte(conn, fonte_id)
+                else:
+                    print("Operação cancelada.")
 
-        elif opcao == "4":
-
-            listar_fontes(empresa_id)
-
-            fonte_id = int(input("Insira o ID da fonte que deseja desativar: "))
-            desativar_fonte(fonte_id)
-
-        elif opcao == "5":
+        elif opcao == 5:
             break
 
         else:
             print("Opção Inválida.")
 
-def menu_principal(empresa_id):
+def menu_principal(conn):
 
     while True:
         print("\n=================================")
@@ -50,20 +68,30 @@ def menu_principal(empresa_id):
         print("[2] Gerencie suas fontes de emissão")
         print("[0] Sair")
 
-        opcao = input("\nEscolha: ").strip()
+        opcao = int(input("\nEscolha: "))
 
-        if opcao == "1":
-            cadastrar_empresa()
+        if opcao == 1:
+            cadastrar_empresa(conn)
 
-        elif opcao == "2":
-            menu_fontes(empresa_id)
+        elif opcao == 2:
+            empresa_id = int(input("Insira o ID da empresa:"))
+            menu_fontes(conn, empresa_id)
 
-        elif opcao == "3": 
+        elif opcao == 0: 
             print("Encerrando. Até logo!")
             break
 
         else:
             print("Opção Inválida.")
+
+
+criar_banco()
+conn = conectar()
+print("Banco iniciado com sucesso.")
+
+menu_principal(conn)
+
+conn.close()
 
 
         
