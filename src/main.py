@@ -11,8 +11,12 @@ def menu_fontes(conn, empresa_id):
         print("[4] Desativar fonte")
         print("[5] Voltar")
 
-        opcao = int(input("\nEscolha: "))
-
+        try:
+            opcao = int(input("\nEscolha: "))
+        except ValueError:
+            print("Opção inválida. Digite apenas números.")
+            continue
+        
         if opcao == 1:
             nome = input("Nome da fonte: ").strip()
             print("Tipos disponíveis:")
@@ -27,7 +31,12 @@ def menu_fontes(conn, empresa_id):
         
         elif opcao == 3:
             listar_fontes(conn, empresa_id)
-            fonte_id = int(input("\nInsira o ID da fonte que deseja alterar (ou 0 para cancelar): "))
+            try:
+                fonte_id = int(input("\nInsira o ID da fonte que deseja alterar (ou 0 para cancelar): "))
+            except ValueError:
+                print("ID inválido. Digite apenas números.")
+                continue  
+            
             if fonte_id == 0:
                 print("Operação cancelada.")
             else:
@@ -40,9 +49,13 @@ def menu_fontes(conn, empresa_id):
                 editar_fonte(conn, fonte_id, novo_nome, novo_tipo, nova_unidade)
 
         elif opcao == 4:
-            listar_fontes(empresa_id)
-
-            fonte_id = int(input("Insira o ID da fonte que deseja desativar (ou 0 para cancelar): "))
+            listar_fontes(conn, empresa_id)
+            try:
+                fonte_id = int(input("Insira o ID da fonte que deseja desativar (ou 0 para cancelar): "))
+            except ValueError:
+                print("ID inválido. Digite apenas números.")
+                continue 
+            
             if fonte_id == 0:
                 print("Operação cancelada")
             else:
@@ -68,13 +81,22 @@ def menu_principal(conn):
         print("[2] Gerencie suas fontes de emissão")
         print("[0] Sair")
 
-        opcao = int(input("\nEscolha: "))
-
+        try:    
+            opcao = int(input("\nEscolha: "))
+        except ValueError:
+            print("Opção inválida. Digite apenas números.")
+            continue
+        
         if opcao == 1:
             cadastrar_empresa(conn)
 
         elif opcao == 2:
-            empresa_id = int(input("Insira o ID da empresa:"))
+            try:
+                empresa_id = int(input("Insira o ID da empresa:"))
+            except ValueError:
+                print("ID inválido. Digite apenas números.")
+                continue  
+            
             menu_fontes(conn, empresa_id)
 
         elif opcao == 0: 

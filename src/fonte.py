@@ -86,14 +86,14 @@ def editar_fonte(conn, fonte_id, novo_nome, novo_tipo, nova_unidade):
 def desativar_fonte(conn, fonte_id):
       
     cursor = conn.execute("""
-        SELECT nome FROM fontes_emissao WHERE id = ? AND empresa_id = ? AND ativo = 1 """, (fonte_id,))
+        SELECT nome FROM fontes_emissao WHERE id = ? AND ativo = 1 """, (fonte_id,))
     fonte = cursor.fetchone()
 
     if fonte is None:
         print("Fonte não encontrada ou já desativada.")
         return 
      
-    conn.execute(""" UPDATE fontes_emissao SET ativo = 0 WHERE id = ? AND empresa_id = ? """, (fonte_id,))
+    conn.execute(""" UPDATE fontes_emissao SET ativo = 0 WHERE id = ? """, (fonte_id,))
 
     conn.commit()
     print(f"A fonte {fonte[0]} foi desativada. O histórico foi mantido.")
