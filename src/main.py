@@ -1,7 +1,7 @@
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa
-from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte, TIPOS_VALIDOS
-
+from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
+from validacoes import TIPOS_VALIDOS
 def menu_fontes(conn, empresa_id):
     while True:
         print("\n----Fontes de Emissão----")

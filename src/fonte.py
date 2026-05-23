@@ -4,18 +4,14 @@ Responsável por:
 - Vincular fontes de emissão (ex: Diesel, Energia Elétrica, GLP) a uma empresa.
 - Ativar ou desativar fontes de emissão no sistema.
 """
-TIPOS_VALIDOS = ["energia_eletrica", "diesel", "gasolina", "etanol", "glp", "residuos"]
-
+from validacoes import TIPOS_VALIDOS, validar_tipo_fonte, validar_empresa_existe
 
 def cadastrar_fonte(conn, empresa_id, nome, tipo, unidade):
-    cursor = conn.execute("SELECT id FROM empresas WHERE id = ?", (empresa_id,))
-    empresa = cursor.fetchone()
-
-    if empresa is None:
+    if not validar_empresa_existe(conn, empresa_id):
         print("Erro: empresa não encontrada.")
         return
     
-    if tipo not in TIPOS_VALIDOS:
+    if not validar_tipo_fonte(tipo):
         print("Erro: tipo inválido. \nTipos aceitos:")
         for t in TIPOS_VALIDOS:
             print(" -", t)
@@ -67,7 +63,7 @@ def editar_fonte(conn, fonte_id, novo_nome, novo_tipo, nova_unidade):
         print("Erro: fonte não encontrada ou já desativada.")
         return
     
-    if novo_tipo not in TIPOS_VALIDOS:
+    if not validar_tipo_fonte(novo_tipo):
         print("Erro: tipo inválido. \nTipos aceitos:")
         for t in TIPOS_VALIDOS:
             print(" -", t)
