@@ -1,0 +1,12 @@
+TIPOS_VALIDOS = ["energia_eletrica", "diesel", "gasolina", "etanol", "glp", "residuos"]
+
+def validar_cnpj_duplicado(conn, cnpj ):
+    cursor = conn.execute("SELECT id FROM empresas WHERE cnpj = ?", (cnpj,))
+    return cursor.fetchone() is not None
+
+def validar_empresa_existe( conn, empresa_id):
+    cursor = conn.execute("SELECT id FROM empresas WHERE id = ?", (empresa_id,))
+    return cursor.fetchone() is not None
+
+def validar_tipo_fonte(tipo):
+    return tipo in TIPOS_VALIDOS
