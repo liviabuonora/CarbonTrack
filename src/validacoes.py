@@ -1,3 +1,5 @@
+import re
+
 TIPOS_VALIDOS = ["energia_eletrica", "diesel", "gasolina", "etanol", "glp", "residuos"]
 
 def validar_cnpj_duplicado(conn, cnpj ):
@@ -10,3 +12,12 @@ def validar_empresa_existe( conn, empresa_id):
 
 def validar_tipo_fonte(tipo):
     return tipo in TIPOS_VALIDOS
+
+def validar_tamanho_cnpj(cnpj):
+    cnpj = re.sub(r"\D", "", cnpj)
+
+    if len(cnpj) != 14:
+        return False
+    else:
+        return True
+

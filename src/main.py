@@ -1,7 +1,10 @@
+import os
+os.system ("cls")
+
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
-from validacoes import TIPOS_VALIDOS
+from validacoes import TIPOS_VALIDOS, validar_tamanho_cnpj
 def menu_fontes(conn, empresa_id):
     while True:
         print("\n----Fontes de Emissão----")
@@ -90,7 +93,13 @@ def menu_principal(conn):
         
         if opcao == 1:
             razao_social = input("Razão social: ").strip()
+
             cnpj = input("CNPJ: ").strip()
+            while not validar_tamanho_cnpj(cnpj):
+                print("CNPJ inválido! Digite novamente.")
+                cnpj = input("Digite o CNPJ: ")
+
+                
             setor = input("Setor: ").strip()   
             cadastrar_empresa(conn, razao_social, cnpj, setor)
 
