@@ -4,15 +4,15 @@ os.system ("cls")
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
-<<<<<<< HEAD
+
 from validacoes import TIPOS_VALIDOS
 import os
 
 os.system("cls")
 
-=======
+
 from validacoes import TIPOS_VALIDOS, validar_tamanho_cnpj
->>>>>>> 77c3b32c666b52a0dcd823bf09eba02a946c87e1
+
 def menu_fontes(conn, empresa_id):
     while True:
         print("\n----Fontes de Emissão----")
