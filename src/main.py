@@ -1,7 +1,7 @@
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
-from validacoes import TIPOS_VALIDOS
+from validacoes import TIPOS_VALIDOS, validar_empresa_existe
 def menu_fontes(conn, empresa_id):
     while True:
         print("\n----Fontes de Emissão----")
@@ -103,6 +103,10 @@ def menu_principal(conn):
             except ValueError:
                 print("ID inválido. Digite apenas números.")
                 continue  
+            
+            if not validar_empresa_existe(conn, empresa_id):
+                print(f"Erro: nenhuma empresa encontrada com ID {empresa_id}.")
+                continue
             
             menu_fontes(conn, empresa_id)
 

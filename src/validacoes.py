@@ -10,3 +10,9 @@ def validar_empresa_existe( conn, empresa_id):
 
 def validar_tipo_fonte(tipo):
     return tipo in TIPOS_VALIDOS
+
+def validar_texto(valor, nome_campo):
+    if valor == "":
+        print(f"Erro: {nome_campo} não pode ser vazio.")
+        return False
+    return True
