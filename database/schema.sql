@@ -58,3 +58,21 @@ INSERT OR IGNORE INTO fatores_emissao (tipo_fonte, fator_conversao, unidade) VAL
     ('residuos',         0.5,       'tCO2e/t');
 
 
+CREATE TABLE IF NOT EXISTS consumos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    fonte_id INTEGER NOT NULL,
+
+    quantidade REAL NOT NULL,
+
+    mes_ref INTEGER NOT NULL,
+
+    ano_ref INTEGER NOT NULL,
+
+    tco2e REAL NOT NULL,
+
+    UNIQUE(fonte_id, mes_ref, ano_ref),
+
+    FOREIGN KEY (fonte_id)
+        REFERENCES fontes_emissao(id)
+);

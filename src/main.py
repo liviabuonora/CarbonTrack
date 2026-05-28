@@ -4,7 +4,7 @@ os.system ("cls")
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
-
+from consumo import registrar_consumo, listar_consumos
 from validacoes import TIPOS_VALIDOS
 import os
 
@@ -20,7 +20,9 @@ def menu_fontes(conn, empresa_id):
         print("[2] Listar fontes ativas")
         print("[3] Editar fonte")
         print("[4] Desativar fonte")
-        print("[5] Voltar")
+        print("[5] Registrar consumo")
+        print("[6] Listar consumos")
+        print("[7] Voltar")
 
         try:
             opcao = int(input("\nEscolha: "))
@@ -77,6 +79,40 @@ def menu_fontes(conn, empresa_id):
                     print("Operação cancelada.")
 
         elif opcao == 5:
+
+            listar_fontes(conn, empresa_id)
+
+            try:
+                fonte_id = int(input("ID da fonte: "))
+                quantidade = float(input("Quantidade consumida: "))
+                mes_ref = int(input("Mês de referência: "))
+                ano_ref = int(input("Ano de referência: "))
+
+            except ValueError:
+                print("Erro: digite valores numéricos válidos.")
+                continue
+
+            registrar_consumo(
+                conn,
+                fonte_id,
+                quantidade,
+                mes_ref,
+                ano_ref
+            )
+
+        elif opcao == 6:
+
+            listar_fontes(conn, empresa_id)
+
+            try:
+                fonte_id = int(input("ID da fonte: "))
+            except ValueError:
+                print("ID inválido.")
+                continue
+
+            listar_consumos(conn, fonte_id)
+
+        elif opcao == 7:
             break
 
         else:
