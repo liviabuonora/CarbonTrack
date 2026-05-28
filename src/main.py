@@ -4,7 +4,15 @@ os.system ("cls")
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
+<<<<<<< HEAD
 from validacoes import TIPOS_VALIDOS, validar_tamanho_cnpj
+=======
+from validacoes import TIPOS_VALIDOS
+import os
+
+os.system("cls")
+
+>>>>>>> main
 def menu_fontes(conn, empresa_id):
     while True:
         print("\n----Fontes de Emissão----")
@@ -92,6 +100,7 @@ def menu_principal(conn):
             continue
         
         if opcao == 1:
+            os.system('cls')
             razao_social = input("Razão social: ").strip()
 
             cnpj = input("CNPJ: ").strip()
