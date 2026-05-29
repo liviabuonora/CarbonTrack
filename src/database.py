@@ -12,9 +12,11 @@ def conectar():
 
 def criar_banco():
     conn = conectar()
-    
-    with open(SCHEMA_PATH, "r", encoding="utf-8") as arquivo:
-        sql = arquivo.read()
-    
-    conn.executescript(sql)
-    conn.close()
+    try:
+        with open(SCHEMA_PATH, "r", encoding="utf-8") as arquivo:
+            sql = arquivo.read()
+        conn.executescript(sql)
+    except FileNotFoundError:
+        print(f"Erro: arquivo schema.sql não encontrado em {SCHEMA_PATH}")
+    finally:      
+        conn.close()

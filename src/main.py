@@ -2,11 +2,12 @@ from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
 from validacoes import TIPOS_VALIDOS, validar_empresa_existe
-def menu_fontes(conn, empresa_id):
+
+def menu_fontes(conn, empresa_id):     
     while True:
         print("\n----Fontes de Emissão----")
         print("[1] Cadastrar nova fonte")
-        print("[2] Listar fontes ativas")
+        print("[2] Listar fontes")
         print("[3] Editar fonte")
         print("[4] Desativar fonte")
         print("[5] Voltar")
@@ -46,7 +47,7 @@ def menu_fontes(conn, empresa_id):
                     print(" -", t)
                 novo_tipo = input("Insira o novo tipo da fonte: ").strip()
                 nova_unidade = input("Insira a nova unidade: ").strip()
-                editar_fonte(conn, fonte_id, novo_nome, novo_tipo, nova_unidade)
+                editar_fonte(conn, empresa_id, fonte_id, novo_nome, novo_tipo, nova_unidade)
 
         elif opcao == 4:
             listar_fontes(conn, empresa_id)
@@ -61,7 +62,7 @@ def menu_fontes(conn, empresa_id):
             else:
                 confirma = input("Tem certeza? (s/n): ").strip()
                 if confirma.lower() == "s":
-                    desativar_fonte(conn, fonte_id)
+                    desativar_fonte(conn, empresa_id, fonte_id)
                 else:
                     print("Operação cancelada.")
 

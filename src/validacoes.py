@@ -16,3 +16,12 @@ def validar_texto(valor, nome_campo):
         print(f"Erro: {nome_campo} não pode ser vazio.")
         return False
     return True
+
+def validar_formato_cnpj(cnpj):
+    if not cnpj.isdigit():
+        print("Erro: CNPJ deve conter apenas números, sem letra, pontos, barras ou traços.")
+        return False
+    if len(cnpj) != 14:
+        print(f"Erro: CNPJ deve ter 14 dígitos. Você digitou {len(cnpj)}.")
+        return False
+    return True

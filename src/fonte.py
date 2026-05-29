@@ -24,24 +24,14 @@ def cadastrar_fonte(conn, empresa_id, nome, tipo, unidade):
     conn.commit()
     print(f"Fonte '{nome}' cadastrada com sucesso!")
 
-def listar_fontes(conn, empresa_id, so_ativas=True):
-
-    if so_ativas:
-        cursor = conn.execute("""
-            SELECT id, nome, tipo, unidade
-            FROM fontes_emissao                        
-            WHERE empresa_id =? AND ativo =1
-            ORDER BY tipo, nome
-        """, (empresa_id,) )                                     
-
-    else: 
-        cursor = conn.execute("""
-            SELECT id, nome, tipo, unidade
-            FROM fontes_emissao
-            WHERE empresa_id =? 
-            ORDER BY tipo, nome
-        """,(empresa_id,))                
-        
+def listar_fontes(conn, empresa_id):                                 
+    cursor = conn.execute("""
+        SELECT id, nome, tipo, unidade, ativo
+        FROM fontes_emissao
+        WHERE empresa_id =? 
+        ORDER BY tipo, nome
+    """,(empresa_id,))                
+    
     fontes = cursor.fetchall()
 
     if len(fontes) == 0:
@@ -49,11 +39,19 @@ def listar_fontes(conn, empresa_id, so_ativas=True):
         return
 
     print("\n--- Fontes cadastradas ---")
-    for fonte in fontes:
-        print("ID:", fonte[0], "| Nome:", fonte[1], "| Tipo:", fonte[2], "| Unidade:", fonte[3])
+    for fonte in fontes:     
+        if fonte[4] == 1:
+            status = "ATIVA"
+        else:
+            status = "INATIVA"
+        print(f"ID: {fonte[0]} | Nome: {fonte[1]} | Tipo: {fonte[2]} | Unidade: {fonte[3]} | Status: {status} ")
 
-def editar_fonte(conn, fonte_id, novo_nome, novo_tipo, nova_unidade):
-    cursor = conn.execute("""SELECT id FROM fontes_emissao WHERE id = ? AND ativo = 1""", (fonte_id,))
+def editar_fonte(conn, empresa_id, fonte_id, novo_nome, novo_tipo, nova_unidade):
+    if not validar_texto(novo_nome, "Nome da fonte"):
+        return
+    if not validar_texto(nova_unidade, "Unidade"):
+        return
+    cursor = conn.execute("""SELECT id FROM fontes_emissao WHERE id = ? AND empresa_id = ? AND ativo = 1""", (fonte_id, empresa_id))
     fonte = cursor.fetchone()
     
     if fonte is None:
@@ -76,10 +74,9 @@ def editar_fonte(conn, fonte_id, novo_nome, novo_tipo, nova_unidade):
     print("Fonte atualizada com sucesso!")
 
 
-def desativar_fonte(conn, fonte_id):
-      
+def desativar_fonte(conn, empresa_id, fonte_id): 
     cursor = conn.execute("""
-        SELECT nome FROM fontes_emissao WHERE id = ? AND ativo = 1 """, (fonte_id,))
+        SELECT nome FROM fontes_emissao WHERE id = ? AND empresa_id = ? AND ativo = 1 """, (fonte_id, empresa_id))
     fonte = cursor.fetchone()
 
     if fonte is None:
