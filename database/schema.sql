@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS historico_consumo (
     
     fonte_id INTEGER NOT NULL, 
     quantidade REAL NOT NULL, 
-    tco2e REAL NOT NULL,
+    tco2_eq REAL NOT NULL,
     mes_ref INTEGER NOT NULL, 
     ano_ref INTEGER NOT NULL,
     registrado_em DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -57,7 +57,7 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
 
     fator = fator_data["fator_conversao"]
 
-    tco2e = calcular_tco2(quantidade, fator)
+    tco2_eq = calcular_tco2(quantidade, fator)
 
     cursor.execute("""
         INSERT INTO consumos (
@@ -65,7 +65,7 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
             quantidade,
             mes_ref,
             ano_ref,
-            tco2e
+            tco2_eq
         )
         VALUES (?, ?, ?, ?, ?)
     """, (
@@ -73,13 +73,13 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
         quantidade,
         mes_ref,
         ano_ref,
-        tco2e
+        tco2_eq
     ))
 
     conn.commit()
 
     print("Consumo registrado com sucesso!")
-    print(f"tCO₂e calculado: {tco2e}")
+    print(f"tCO₂e calculado: {tco2_eq}")
 
 
 def listar_consumos(conn, fonte_id):
@@ -92,7 +92,7 @@ def listar_consumos(conn, fonte_id):
             c.ano_ref,
             c.quantidade,
             f.unidade,
-            c.tco2e
+            c.tco2_eq
         FROM consumos c
         JOIN fontes_emissao f
             ON c.fonte_id = f.id
@@ -110,10 +110,10 @@ def listar_consumos(conn, fonte_id):
 
     for consumo in consumos:
 
-        mes, ano, quantidade, unidade, tco2e = consumo
+        mes, ano, quantidade, unidade, tco2_eq = consumo
 
         print(
             f"{mes:02d}/{ano} | "
             f"{quantidade} {unidade} | "
-            f"{tco2e} tCO₂e"
+            f"{tco2_eq} tCO₂e"
         )
