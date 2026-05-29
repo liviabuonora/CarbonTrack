@@ -1,15 +1,22 @@
+import os
+os.system ("cls")
+
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
-from validacoes import TIPOS_VALIDOS
+from validacoes import TIPOS_VALIDOS, validar_empresa_existe, validar_formato_cnpj
+from consumo import registrar_consumo, listar_consumos
+
 def menu_fontes(conn, empresa_id):
     while True:
         print("\n----Fontes de Emissão----")
         print("[1] Cadastrar nova fonte")
-        print("[2] Listar fontes ativas")
+        print("[2] Listar fontes")
         print("[3] Editar fonte")
         print("[4] Desativar fonte")
-        print("[5] Voltar")
+        print("[5] Registrar consumo")
+        print("[6] Listar consumos")
+        print("[7] Voltar")
 
         try:
             opcao = int(input("\nEscolha: "))
@@ -46,7 +53,7 @@ def menu_fontes(conn, empresa_id):
                     print(" -", t)
                 novo_tipo = input("Insira o novo tipo da fonte: ").strip()
                 nova_unidade = input("Insira a nova unidade: ").strip()
-                editar_fonte(conn, fonte_id, novo_nome, novo_tipo, nova_unidade)
+                editar_fonte(conn, empresa_id, fonte_id, novo_nome, novo_tipo, nova_unidade)
 
         elif opcao == 4:
             listar_fontes(conn, empresa_id)
@@ -61,11 +68,45 @@ def menu_fontes(conn, empresa_id):
             else:
                 confirma = input("Tem certeza? (s/n): ").strip()
                 if confirma.lower() == "s":
-                    desativar_fonte(conn, fonte_id)
+                    desativar_fonte(conn, empresa_id, fonte_id)
                 else:
                     print("Operação cancelada.")
 
         elif opcao == 5:
+
+            listar_fontes(conn, empresa_id)
+
+            try:
+                fonte_id = int(input("ID da fonte: "))
+                quantidade = float(input("Quantidade consumida: "))
+                mes_ref = int(input("Mês de referência: "))
+                ano_ref = int(input("Ano de referência: "))
+
+            except ValueError:
+                print("Erro: digite valores numéricos válidos.")
+                continue
+
+            registrar_consumo(
+                conn,
+                fonte_id,
+                quantidade,
+                mes_ref,
+                ano_ref
+            )
+
+        elif opcao == 6:
+
+            listar_fontes(conn, empresa_id)
+
+            try:
+                fonte_id = int(input("ID da fonte: "))
+            except ValueError:
+                print("ID inválido.")
+                continue
+
+            listar_consumos(conn, fonte_id)
+
+        elif opcao == 7:
             break
 
         else:
@@ -89,8 +130,13 @@ def menu_principal(conn):
             continue
         
         if opcao == 1:
+            os.system('cls')
             razao_social = input("Razão social: ").strip()
+
             cnpj = input("CNPJ: ").strip()
+            while not validar_formato_cnpj(cnpj):
+                print("Erro: São necessarios 14 digitos e deve conter apenas números")
+                cnpj = input("Digite o CNPJ: ")
             setor = input("Setor: ").strip()   
             cadastrar_empresa(conn, razao_social, cnpj, setor)
 
@@ -103,6 +149,10 @@ def menu_principal(conn):
             except ValueError:
                 print("ID inválido. Digite apenas números.")
                 continue  
+            
+            if not validar_empresa_existe(conn, empresa_id):
+                print(f"Erro: nenhuma empresa encontrada com ID {empresa_id}.")
+                continue
             
             menu_fontes(conn, empresa_id)
 
