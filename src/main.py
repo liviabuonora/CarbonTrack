@@ -5,12 +5,6 @@ from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
 from consumo import registrar_consumo, listar_consumos
-from validacoes import TIPOS_VALIDOS
-import os
-
-os.system("cls")
-
-
 from validacoes import TIPOS_VALIDOS, validar_tamanho_cnpj
 
 def menu_fontes(conn, empresa_id):
