@@ -1,5 +1,5 @@
 from calculo import buscar_fator, calcular_tco2
-
+import sqlite3
 
 def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
 
@@ -37,7 +37,7 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
 
     cursor.execute("""
         SELECT id
-        FROM consumos
+        FROM historico_consumo
         WHERE fonte_id = ?
         AND mes_ref = ?
         AND ano_ref = ?
@@ -59,28 +59,30 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
 
     tco2_eq = calcular_tco2(quantidade, fator)
 
-    cursor.execute("""
-        INSERT INTO consumos (
+    try:
+        cursor.execute("""
+            INSERT INTO historico_consumo (
+                fonte_id,
+                quantidade,
+                mes_ref,
+                ano_ref,
+                tco2_eq
+            )
+            VALUES (?, ?, ?, ?, ?)
+        """, (
             fonte_id,
             quantidade,
             mes_ref,
             ano_ref,
             tco2_eq
-        )
-        VALUES (?, ?, ?, ?, ?)
-    """, (
-        fonte_id,
-        quantidade,
-        mes_ref,
-        ano_ref,
-        tco2_eq
-    ))
+        ))
 
-    conn.commit()
+        conn.commit()
 
-    print("Consumo registrado com sucesso!")
-    print(f"tCO₂e calculado: {tco2_eq}")
-
+        print("Consumo registrado com sucesso!")
+        print(f"tCO₂e calculado: {tco2_eq}")
+    except sqlite3.IntegrityError:
+        print("Erro: consumo já registrado para este período.")
 
 def listar_consumos(conn, fonte_id):
 
@@ -93,7 +95,7 @@ def listar_consumos(conn, fonte_id):
             c.quantidade,
             f.unidade,
             c.tco2_eq
-        FROM consumos c
+        FROM historico_consumo c
         JOIN fontes_emissao f
             ON c.fonte_id = f.id
         WHERE c.fonte_id = ?

@@ -16,7 +16,10 @@ def buscar_fator (conn,tipo_fonte):
 
 def calcular_tco2(quantidade,fator):
 
-    tco2_eq = quantidade * fator
+    if fator is None:
+        return None
+    
+    tco2_eq = quantidade * fator["fator_conversao"]
 
     return round(tco2_eq ,6)
 
