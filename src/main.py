@@ -1,7 +1,7 @@
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
-from validacoes import TIPOS_VALIDOS, validar_empresa_existe
+from validacoes import TIPOS_VALIDOS, validar_empresa_existe, validar_formato_cnpj
 
 def menu_fontes(conn, empresa_id):     
     while True:
@@ -92,6 +92,9 @@ def menu_principal(conn):
         if opcao == 1:
             razao_social = input("Razão social: ").strip()
             cnpj = input("CNPJ: ").strip()
+            while not validar_formato_cnpj(cnpj):
+                print("Erro: São necessarios 14 digitos e deve conter apenas números")
+                cnpj = input("Digite o CNPJ: ")
             setor = input("Setor: ").strip()   
             cadastrar_empresa(conn, razao_social, cnpj, setor)
 
