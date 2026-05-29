@@ -1,10 +1,11 @@
+import os
+os.system ("cls")
+
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
 from validacoes import TIPOS_VALIDOS, validar_empresa_existe, validar_formato_cnpj
-import os
-
-os.system("cls")
+from consumo import registrar_consumo, listar_consumos
 
 def menu_fontes(conn, empresa_id):
     while True:
@@ -13,7 +14,9 @@ def menu_fontes(conn, empresa_id):
         print("[2] Listar fontes")
         print("[3] Editar fonte")
         print("[4] Desativar fonte")
-        print("[5] Voltar")
+        print("[5] Registrar consumo")
+        print("[6] Listar consumos")
+        print("[7] Voltar")
 
         try:
             opcao = int(input("\nEscolha: "))
@@ -70,6 +73,40 @@ def menu_fontes(conn, empresa_id):
                     print("Operação cancelada.")
 
         elif opcao == 5:
+
+            listar_fontes(conn, empresa_id)
+
+            try:
+                fonte_id = int(input("ID da fonte: "))
+                quantidade = float(input("Quantidade consumida: "))
+                mes_ref = int(input("Mês de referência: "))
+                ano_ref = int(input("Ano de referência: "))
+
+            except ValueError:
+                print("Erro: digite valores numéricos válidos.")
+                continue
+
+            registrar_consumo(
+                conn,
+                fonte_id,
+                quantidade,
+                mes_ref,
+                ano_ref
+            )
+
+        elif opcao == 6:
+
+            listar_fontes(conn, empresa_id)
+
+            try:
+                fonte_id = int(input("ID da fonte: "))
+            except ValueError:
+                print("ID inválido.")
+                continue
+
+            listar_consumos(conn, fonte_id)
+
+        elif opcao == 7:
             break
 
         else:
@@ -95,6 +132,7 @@ def menu_principal(conn):
         if opcao == 1:
             os.system('cls')
             razao_social = input("Razão social: ").strip()
+
             cnpj = input("CNPJ: ").strip()
             while not validar_formato_cnpj(cnpj):
                 print("Erro: São necessarios 14 digitos e deve conter apenas números")
