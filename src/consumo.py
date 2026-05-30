@@ -1,4 +1,5 @@
 from calculo import buscar_fator, calcular_tco2
+from validacoes import validar_quantidade, validar_discrepancia
 import sqlite3
 
 def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
@@ -13,10 +14,12 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
         print("Erro: ano deve ser maior ou igual a 2000.")
         return
 
-    if quantidade <= 0:
-        print("Erro: quantidade deve ser maior que zero.")
+    if not validar_quantidade(quantidade):
         return
 
+    if not validar_discrepancia(conn, fonte_id, quantidade):
+        return
+    
     cursor.execute("""
         SELECT tipo, unidade, ativo
         FROM fontes_emissao
