@@ -47,7 +47,9 @@ def validar_discrepancia(conn, fonte_id, quantidade):
     if len(historico) == 0:
         return True
     
-    valores = [item[0] for item in historico]
+    valores = []
+    for item in historico:
+        valores.append(item[0])
     media = sum(valores) / len(valores)
     
     if quantidade > media * 5:

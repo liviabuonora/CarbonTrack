@@ -19,7 +19,7 @@ def calcular_tco2(quantidade,fator):
     if fator is None:
         return None
     
-    tco2_eq = quantidade * fator["fator_conversao"]
+    tco2_eq = quantidade * fator
 
     return round(tco2_eq ,6)
 

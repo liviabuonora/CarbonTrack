@@ -16,28 +16,28 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
 
     if not validar_quantidade(quantidade):
         return
-
-    if not validar_discrepancia(conn, fonte_id, quantidade):
-        return
     
     cursor.execute("""
-        SELECT tipo, unidade, ativo
-        FROM fontes_emissao
-        WHERE id = ?
-    """, (fonte_id,))
+            SELECT tipo, unidade, ativo
+            FROM fontes_emissao
+            WHERE id = ?
+        """, (fonte_id,))
 
     fonte = cursor.fetchone()
 
     if fonte is None:
-        print("Erro: fonte não encontrada.")
-        return
+            print("Erro: fonte não encontrada.")
+            return
 
     tipo, unidade, ativo = fonte
 
     if ativo == 0:
-        print("Erro: esta fonte está desativada.")
+            print("Erro: esta fonte está desativada.")
+            return
+    
+    if not validar_discrepancia(conn, fonte_id, quantidade):
         return
-
+    
     cursor.execute("""
         SELECT id
         FROM historico_consumo
