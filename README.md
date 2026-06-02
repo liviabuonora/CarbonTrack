@@ -15,7 +15,6 @@ Baseado em cadastro de empresas e fontes de emissão, a plataforma registra cons
 
 - Python;
 - SQLite;
-- CRUD;
 - Git & GitHub;
 - Notion;
 - GitHub Projects.
@@ -43,12 +42,12 @@ Baseado em cadastro de empresas e fontes de emissão, a plataforma registra cons
 ---
 
 ## Equipe
-- Gabriel Salvador 
-- Jullya Medeiros 
-- Lívia Buonora 
-- Marcos Vinícius 
-- Rafael Gurgel 
-- Vinícius Machado 
+- [Gabriel Salvador](https://github.com/Gabriel-Salvador-1) 
+- [Jullya Medeiros](https://github.com/juuvmed)
+- [Lívia Buonora](https://github.com/liviabuonora)
+- [Marcos Vinícius](https://github.com/marcos-felipe17) 
+- [Rafael Gurgel](https://github.com/RafaelGMedeiros) 
+- [Vinícius Machado](https://github.com/vml2-lab) 
 
 
 ---
