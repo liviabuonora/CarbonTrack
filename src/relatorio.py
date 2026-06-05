@@ -4,7 +4,7 @@ import os
 PASTA_CSV = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def exportar_csv(conn, empresa_id):
-    cursor = conn.execute()
+    cursor = conn.cursor()
     cursor.execute("""
         SELECT
             f.nome,
@@ -13,21 +13,33 @@ def exportar_csv(conn, empresa_id):
             c.ano_ref,
             c.quantidade,
             f.unidade,
-            c.tco2_eq,
-                
+            c.tco2_eq      
         FROM historico_consumo c
         JOIN fontes_emissao f
             ON c.fonte_id = f.id
         WHERE f.empresa_id = ?
         ORDER BY c.ano_ref, c.mes_ref, f.nome
-                 """, (empresa_id))
+                 """, (empresa_id,))
     
     dados = cursor.fetchall()
 
-    if len(dados)==0:
+    if len(dados) == 0:
         print("Nenhum dado encontrado.")
         return 
     
-    nome_arquivo = f"Relatorio_empresa{empresa_id}"
+    nome_arquivo = f"Relatorio_empresa{empresa_id}.csv"
     caminho = os.path.join(PASTA_CSV,nome_arquivo)
-    with open (caminho, mode = "w" , newline="" , encoding="utf-8-sig")as arquivo:
+    with open (caminho, mode = "w" , newline="" , encoding="utf-8-sig") as arquivo:
+        writer = csv.writer(arquivo, delimiter = ";")
+        writer.writerow(["fonte", "tipo", "mes", "ano", "quantidade", "unidade", "tco2_eq"])
+        
+        for linha in dados:
+            writer.writerow(linha)
+
+    print(f"Relatório exportado: {caminho}")
+if __name__ == "__main__":
+    from database import conectar, criar_banco
+    criar_banco()
+    conn = conectar()
+    exportar_csv(conn, 8)
+    conn.close()
