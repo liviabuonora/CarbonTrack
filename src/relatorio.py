@@ -37,9 +37,3 @@ def exportar_csv(conn, empresa_id):
             writer.writerow(linha)
 
     print(f"Relatório exportado: {caminho}")
-if __name__ == "__main__":
-    from database import conectar, criar_banco
-    criar_banco()
-    conn = conectar()
-    exportar_csv(conn, 8)
-    conn.close()
