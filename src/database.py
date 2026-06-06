@@ -1,9 +1,9 @@
 import sqlite3
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, "database", "app.db")
-SCHEMA_PATH = os.path.join(BASE_DIR, "database", "schema.sql")
+PASTA_PROJETO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(PASTA_PROJETO, "database", "app.db")
+SCHEMA_PATH = os.path.join(PASTA_PROJETO, "database", "schema.sql")
 
 def conectar():
     conn = sqlite3.connect(DB_PATH)

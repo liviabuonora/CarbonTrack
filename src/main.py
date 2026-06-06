@@ -106,7 +106,7 @@ def menu_fontes(conn, empresa_id):
                 print("ID inválido.")
                 continue
 
-            listar_consumos(conn, fonte_id)
+            listar_consumos(conn, empresa_id, fonte_id)
 
         elif opcao == 7:
             menu_relatorios(conn, empresa_id)

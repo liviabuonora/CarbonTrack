@@ -83,7 +83,7 @@ def desativar_fonte(conn, empresa_id, fonte_id):
         print("Fonte não encontrada ou já desativada.")
         return 
      
-    conn.execute(""" UPDATE fontes_emissao SET ativo = 0 WHERE id = ? """, (fonte_id,))
+    conn.execute(""" UPDATE fontes_emissao SET ativo = 0 WHERE id = ?  AND empresa_id = ?""", (fonte_id, empresa_id))
 
     conn.commit()
     print(f"A fonte {fonte[0]} foi desativada. O histórico foi mantido.")
