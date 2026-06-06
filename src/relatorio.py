@@ -164,6 +164,15 @@ def relatorio_evolucao(conn, empresa_id):
 
 def exportar_csv(conn, empresa_id):
     cursor = conn.cursor()
+    cursor.execute("SELECT razao_social FROM empresas WHERE id = ?", (empresa_id,))
+    resultado_empresa = cursor.fetchone()
+
+    if resultado_empresa is None:
+        print("Erro: Empresa não encontrada para exportação.")
+        return
+    nome_empresa = resultado_empresa[0]
+    nome_limpo = nome_empresa.replace(" ", "_").replace("/", "_").lower()
+
     cursor.execute("""
         SELECT
             f.nome,
@@ -186,7 +195,7 @@ def exportar_csv(conn, empresa_id):
         print("Nenhum dado encontrado.")
         return 
     
-    nome_arquivo = f"relatorio_empresa_{empresa_id}.csv"
+    nome_arquivo = f"relatorio_empresa_{nome_limpo}.csv"
     caminho = os.path.join(PASTA_PROJETO,nome_arquivo)
     with open (caminho, mode = "w" , newline="" , encoding="utf-8-sig") as arquivo:
         writer = csv.writer(arquivo, delimiter = ";")
