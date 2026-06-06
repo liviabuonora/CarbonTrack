@@ -1,7 +1,7 @@
 import csv
 import os 
 
-PASTA_CSV = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PASTA_PROJETO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def exportar_csv(conn, empresa_id):
     cursor = conn.cursor()
@@ -27,8 +27,8 @@ def exportar_csv(conn, empresa_id):
         print("Nenhum dado encontrado.")
         return 
     
-    nome_arquivo = f"Relatorio_empresa{empresa_id}.csv"
-    caminho = os.path.join(PASTA_CSV,nome_arquivo)
+    nome_arquivo = f"relatorio_empresa_{empresa_id}.csv"
+    caminho = os.path.join(PASTA_PROJETO,nome_arquivo)
     with open (caminho, mode = "w" , newline="" , encoding="utf-8-sig") as arquivo:
         writer = csv.writer(arquivo, delimiter = ";")
         writer.writerow(["fonte", "tipo", "mes", "ano", "quantidade", "unidade", "tco2_eq"])

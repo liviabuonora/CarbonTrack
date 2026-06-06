@@ -87,7 +87,7 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
     except sqlite3.IntegrityError:
         print("Erro: consumo já registrado para este período.")
 
-def listar_consumos(conn, fonte_id):
+def listar_consumos(conn, empresa_id, fonte_id):
 
     cursor = conn.cursor()
 
@@ -101,9 +101,9 @@ def listar_consumos(conn, fonte_id):
         FROM historico_consumo c
         JOIN fontes_emissao f
             ON c.fonte_id = f.id
-        WHERE c.fonte_id = ?
+        WHERE c.fonte_id = ? AND f.empresa_id = ?
         ORDER BY c.ano_ref, c.mes_ref
-    """, (fonte_id,))
+    """, (fonte_id, empresa_id))
 
     consumos = cursor.fetchall()
 
