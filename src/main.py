@@ -6,7 +6,7 @@ from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
 from validacoes import TIPOS_VALIDOS, validar_empresa_existe, validar_formato_cnpj
 from consumo import registrar_consumo, listar_consumos
-from relatorio import consultar_historico_por_fonte, consultar_historico_por_periodo
+from relatorio import menu_relatorios
 
 def menu_fontes(conn, empresa_id):
     while True:
@@ -112,43 +112,6 @@ def menu_fontes(conn, empresa_id):
             menu_relatorios(conn, empresa_id)
 
         elif opcao == 8:
-            break
-
-        else:
-            print("Opção Inválida.")
-
-def menu_relatorios(conn, empresa_id):
-    while True:
-        print("\n----Relatórios----")
-        print("[1] Histórico por fonte")
-        print("[2] Histórico por período")
-        print("[3] Voltar")
-
-        try:
-            opcao = int(input("\nEscolha: "))
-        except ValueError:
-            print("Opção inválida. Digite apenas números.")
-            continue
-
-        if opcao == 1:
-            listar_fontes(conn, empresa_id)
-            try:
-                fonte_id = int(input("ID da fonte: "))
-            except ValueError:
-                print("ID inválido.")
-                continue
-            consultar_historico_por_fonte(conn, empresa_id, fonte_id)
-
-        elif opcao == 2:
-            try:
-                mes_ref = int(input("Mês de referência: "))
-                ano_ref = int(input("Ano de referência: "))
-            except ValueError:
-                print("Erro: digite valores numéricos válidos.")
-                continue
-            consultar_historico_por_periodo(conn, empresa_id, mes_ref, ano_ref)
-
-        elif opcao == 3:
             break
 
         else:

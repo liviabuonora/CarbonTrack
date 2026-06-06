@@ -1,5 +1,6 @@
 import csv
 import os 
+from fonte import listar_fontes
 
 PASTA_PROJETO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -193,3 +194,96 @@ def exportar_csv(conn, empresa_id):
             writer.writerow(linha)
 
     print(f"Relatório exportado: {caminho}")
+
+def verificar_alerta_periodo(conn, empresa_id, mes_ref, ano_ref):
+    if mes_ref < 1 or mes_ref > 12:
+        print("Erro: mês deve estar entre 1 e 12.")
+        return
+
+    mes_ant = mes_ref - 1
+    ano_ant = ano_ref
+    if mes_ant == 0:
+        mes_ant = 12
+        ano_ant -= 1
+
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT SUM(c.tco2_eq) FROM historico_consumo c
+        JOIN fontes_emissao f ON c.fonte_id = f.id
+        WHERE f.empresa_id = ? AND c.mes_ref = ? AND c.ano_ref = ?
+    """, (empresa_id, mes_ref, ano_ref))
+    atual = cursor.fetchone()[0]
+    if atual is None:
+        print("Sem dados para o período informado.")
+        return
+    
+    cursor.execute("""
+        SELECT SUM(c.tco2_eq) FROM historico_consumo c
+        JOIN fontes_emissao f ON c.fonte_id = f.id
+        WHERE f.empresa_id = ? AND c.mes_ref = ? AND c.ano_ref = ?
+    """, (empresa_id, mes_ant, ano_ant))
+    anterior = cursor.fetchone()[0]
+    if anterior is None:
+        print("Primeiro período cadastrado ou sem histórico anterior suficiente para alerta.")
+        return
+
+    diferenca = ((atual - anterior) / anterior) * 100
+
+    if diferenca >= 30:
+        print(f"\nATENÇÃO: Alerta de emissões!")
+        print(f"{mes_ref:02d}/{ano_ref} ({atual:.1f} tCO2e) é {diferenca:.1f}% acima de {mes_ant:02d}/{ano_ant} ({anterior:.1f} tCO2e)")
+    else:
+        print(f"Variação dentro do aceitável ({diferenca:.1f}% em relação ao período anterior).")
+
+def menu_relatorios(conn, empresa_id):
+    while True:
+        print("\n----Relatórios----")
+        print("[1] Consultar histórico por fonte")
+        print("[2] Consultar histórico por período")
+        print("[3] Relatório de evolução")
+        print("[4] Exportar CSV")
+        print("[5] Verificar alerta 30%")
+        print("[6] Voltar")
+
+        try:
+            opcao = int(input("\nEscolha: "))
+        except ValueError:
+            print("Opção inválida. Digite apenas números.")
+            continue
+
+        if opcao == 1:
+            listar_fontes(conn, empresa_id)
+            try:
+                fonte_id = int(input("ID da fonte: "))
+                consultar_historico_por_fonte(conn, empresa_id, fonte_id)
+            except ValueError:
+                print("ID inválido.")
+                continue
+
+        elif opcao == 2:
+            try:
+                mes_ref = int(input("Mês de referência: "))
+                ano_ref = int(input("Ano de referência: "))
+            except ValueError:
+                print("Erro: digite valores numéricos válidos.")
+                consultar_historico_por_periodo(conn, empresa_id, mes_ref, ano_ref)
+                continue
+            
+        elif opcao == 3:
+            relatorio_evolucao(conn, empresa_id)
+        elif opcao == 4:
+            exportar_csv(conn, empresa_id)
+        
+        elif opcao == 5:
+            try:
+                mes_ref = int(input("Mês de referência (atual): "))
+                ano_ref = int(input("Ano de referência (atual): "))
+                verificar_alerta_periodo(conn, empresa_id, mes_ref, ano_ref)
+            except ValueError:
+                print("Erro: digite valores numéricos válidos.")
+        
+        elif opcao == 6:
+            break
+        else:
+            print("Opção Inválida.")
