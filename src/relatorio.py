@@ -3,10 +3,10 @@ def consultar_historico_por_fonte(conn, empresa_id, fonte_id):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT fe.nome
-        FROM fontes_emissao fe
-        WHERE fe.id = ?
-        AND fe.empresa_id = ?
+        SELECT nome
+        FROM fontes_emissao
+        WHERE id = ?
+        AND empresa_id = ?
     """, (fonte_id, empresa_id))
 
     fonte = cursor.fetchone()
