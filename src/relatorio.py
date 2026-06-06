@@ -6,8 +6,8 @@ Responsável por:
 """
 
 def relatorio_evolucao(conn, empresa_id):
-
-    cursor = conn.execute("""
+    cursor = conn.curor()
+    cursor.execute("""
         SELECT mes_ref, ano_ref, SUM(tco2_eq)
         FROM historico_consumo
         WHERE fonte_id IN (
@@ -29,20 +29,14 @@ def relatorio_evolucao(conn, empresa_id):
 
     for mes_ref, ano_ref, atual in periodos:
 
-        if anterior is None:
+        if anterior is None or anterior == 0:
             variacao = "—"
-
         else:
+            variacao = ((atual - anterior) / anterior) * 100
+            variacao = f"{variacao:.2f}%"
 
-            if anterior == 0:
-                variacao = "—"
-
-            else:
-                variacao = ((atual - anterior) / anterior) * 100
-                variacao = f"{variacao:.2f}%"
-
-        print(f"Mês: {mes_ref}/{ano_ref}")
-        print(f"Total: {atual}")
+        print(f"Mês: {mes_ref:2d}/{ano_ref}")
+        print(f"Total: {atual:.2f} tCO2e")
         print(f"Variação: {variacao}")
         print("-" * 30)
         anterior = atual
@@ -50,7 +44,7 @@ def relatorio_evolucao(conn, empresa_id):
     ultimo_mes = periodos[-1][0]
     ultimo_ano = periodos[-1][1]
 
-    cursor = conn.execute("""
+    cursor.execute("""
         SELECT f.nome, SUM(c.tco2_eq)
         FROM historico_consumo c
         JOIN fontes_emissao f ON c.fonte_id = f.id
@@ -66,7 +60,4 @@ def relatorio_evolucao(conn, empresa_id):
 
     if resultado:
 
-        print("\nFonte principal do último periodo: ")
-        
-        print(f"Fonte principal: {resultado[0]}")
-        print(f"Emissão: {resultado[1]:.2f} tCO2eq")
+       print(f"\nFonte principal em {ultimo_mes:02d}/{ultimo_ano}: {resultado[0]} ({resultado[1]:.2f} tCO2eq)")
