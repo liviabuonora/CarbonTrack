@@ -1,5 +1,5 @@
 import os
-os.system ("cls")
+os.system ('cls' if os.name == 'nt' else 'clear')
 
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
@@ -88,13 +88,7 @@ def menu_fontes(conn, empresa_id):
                 print("Erro: digite valores numéricos válidos.")
                 continue
 
-            registrar_consumo(
-                conn,
-                fonte_id,
-                quantidade,
-                mes_ref,
-                ano_ref
-            )
+            registrar_consumo(conn, empresa_id, fonte_id, quantidade, mes_ref, ano_ref)
 
         elif opcao == 6:
 
@@ -135,7 +129,7 @@ def menu_principal(conn):
             continue
         
         if opcao == 1:
-            os.system('cls')
+            os.system('cls' if os.name == 'nt' else 'clear')
             razao_social = input("Razão social: ").strip()
 
             cnpj = input("CNPJ: ").strip()

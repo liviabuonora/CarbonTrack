@@ -1,9 +1,3 @@
-"""
-Módulo de Fontes de Emissão (US02 e US07)
-Responsável por:
-- Vincular fontes de emissão (ex: Diesel, Energia Elétrica, GLP) a uma empresa.
-- Ativar ou desativar fontes de emissão no sistema.
-"""
 from validacoes import TIPOS_VALIDOS, validar_tipo_fonte, validar_empresa_existe, validar_texto
 
 def cadastrar_fonte(conn, empresa_id, nome, tipo, unidade):

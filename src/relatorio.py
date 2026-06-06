@@ -58,7 +58,9 @@ def consultar_historico_por_fonte(conn, empresa_id, fonte_id):
 
 
 def consultar_historico_por_periodo(conn, empresa_id, mes_ref, ano_ref):
-
+    if ano_ref < 2000:
+        print("Erro: ano deve ser maior ou igual a 2000.")
+        return
     if mes_ref < 1 or mes_ref > 12:
         print("Erro: mês deve estar entre 1 e 12.")
         return
@@ -102,7 +104,7 @@ def consultar_historico_por_periodo(conn, empresa_id, mes_ref, ano_ref):
         )
 
 def relatorio_evolucao(conn, empresa_id):
-    cursor = conn.curor()
+    cursor = conn.cursor()
     cursor.execute("""
         SELECT mes_ref, ano_ref, SUM(tco2_eq)
         FROM historico_consumo
@@ -131,7 +133,7 @@ def relatorio_evolucao(conn, empresa_id):
             variacao = ((atual - anterior) / anterior) * 100
             variacao = f"{variacao:.2f}%"
 
-        print(f"Mês: {mes_ref:2d}/{ano_ref}")
+        print(f"Mês: {mes_ref:02d}/{ano_ref}")
         print(f"Total: {atual:.2f} tCO2e")
         print(f"Variação: {variacao}")
         print("-" * 30)
@@ -196,6 +198,9 @@ def exportar_csv(conn, empresa_id):
     print(f"Relatório exportado: {caminho}")
 
 def verificar_alerta_periodo(conn, empresa_id, mes_ref, ano_ref):
+    if ano_ref < 2000:
+        print("Erro: ano deve ser maior ou igual a 2000.")
+        return
     if mes_ref < 1 or mes_ref > 12:
         print("Erro: mês deve estar entre 1 e 12.")
         return
@@ -265,9 +270,10 @@ def menu_relatorios(conn, empresa_id):
             try:
                 mes_ref = int(input("Mês de referência: "))
                 ano_ref = int(input("Ano de referência: "))
+                consultar_historico_por_periodo(conn, empresa_id, mes_ref, ano_ref)
             except ValueError:
                 print("Erro: digite valores numéricos válidos.")
-                consultar_historico_por_periodo(conn, empresa_id, mes_ref, ano_ref)
+               
                 continue
             
         elif opcao == 3:

@@ -2,7 +2,7 @@ from calculo import buscar_fator, calcular_tco2
 from validacoes import validar_quantidade, validar_discrepancia
 import sqlite3
 
-def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
+def registrar_consumo(conn, empresa_id, fonte_id, quantidade, mes_ref, ano_ref):
 
     cursor = conn.cursor()
 
@@ -20,8 +20,8 @@ def registrar_consumo(conn, fonte_id, quantidade, mes_ref, ano_ref):
     cursor.execute("""
             SELECT tipo, unidade, ativo
             FROM fontes_emissao
-            WHERE id = ?
-        """, (fonte_id,))
+            WHERE id = ? AND empresa_id = ?
+        """, (fonte_id, empresa_id))
 
     fonte = cursor.fetchone()
 
