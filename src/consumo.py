@@ -37,20 +37,6 @@ def registrar_consumo(conn, empresa_id, fonte_id, quantidade, mes_ref, ano_ref):
     
     if not validar_discrepancia(conn, fonte_id, quantidade):
         return
-    
-    cursor.execute("""
-        SELECT id
-        FROM historico_consumo
-        WHERE fonte_id = ?
-        AND mes_ref = ?
-        AND ano_ref = ?
-    """, (fonte_id, mes_ref, ano_ref))
-
-    duplicado = cursor.fetchone()
-
-    if duplicado:
-        print("Erro: já existe consumo registrado para essa fonte nesse período.")
-        return
 
     fator_data = buscar_fator(conn, tipo)
 
