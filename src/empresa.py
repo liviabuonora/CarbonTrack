@@ -10,12 +10,12 @@ def cadastrar_empresa(conn, razao_social, cnpj, setor):
     if not validar_formato_cnpj(cnpj):
         return
     if validar_cnpj_duplicado(conn, cnpj ):
-        print("Erro: CNPJ já cadastrado.")
+        print("\033[31mErro:\033[0m CNPJ já cadastrado.")
         return
     
     conn.execute(""" INSERT INTO empresas (razao_social, cnpj, setor) VALUES (?, ?, ?) """, (razao_social, cnpj, setor))
     conn.commit()
-    print(f"Empresa '{razao_social}' cadastrada com sucesso!")
+    print(f"\033[32mEmpresa '{razao_social}' cadastrada com sucesso!\033[0m")
 
 def listar_empresas(conn):
     cursor = conn.execute("""

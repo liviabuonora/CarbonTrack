@@ -85,7 +85,7 @@ def menu_fontes(conn, empresa_id):
                 ano_ref = int(input("Ano de referência: "))
 
             except ValueError:
-                print("Erro: digite valores numéricos válidos.")
+                print("\033[31mErro:\033[0m digite valores numéricos válidos.")
                 continue
 
             registrar_consumo(conn, empresa_id, fonte_id, quantidade, mes_ref, ano_ref)
@@ -134,7 +134,7 @@ def menu_principal(conn):
 
             cnpj = input("CNPJ: ").strip()
             while not validar_formato_cnpj(cnpj):
-                print("Erro: São necessarios 14 digitos e deve conter apenas números")
+                print("\033[31mErro:\033[0m São necessarios 14 digitos e deve conter apenas números")
                 cnpj = input("Digite o CNPJ: ")
             setor = input("Setor: ").strip()   
             cadastrar_empresa(conn, razao_social, cnpj, setor)
@@ -150,7 +150,7 @@ def menu_principal(conn):
                 continue  
             
             if not validar_empresa_existe(conn, empresa_id):
-                print(f"Erro: nenhuma empresa encontrada com ID {empresa_id}.")
+                print(f"\033[31mErro:\033[0m nenhuma empresa encontrada com ID {empresa_id}.")
                 continue
             
             menu_fontes(conn, empresa_id)
@@ -165,7 +165,7 @@ def menu_principal(conn):
 
 criar_banco()
 conn = conectar()
-print("Banco iniciado com sucesso.")
+print("\033[32mBanco iniciado com sucesso.\033[0m")
 
 menu_principal(conn)
 
