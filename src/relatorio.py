@@ -1,6 +1,304 @@
-"""
-Módulo de Relatórios e Consultas (US05, US08 e US09)
-Responsável por:
-- Buscar os dados históricos de consumo no banco de dados.
-- Formatar os resultados das emissões totais de forma clara para o gestor da PME.
-"""
+import csv
+import os 
+from fonte import listar_fontes
+
+PASTA_PROJETO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def consultar_historico_por_fonte(conn, empresa_id, fonte_id):
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nome
+        FROM fontes_emissao
+        WHERE id = ?
+        AND empresa_id = ?
+    """, (fonte_id, empresa_id))
+
+    fonte = cursor.fetchone()
+
+    if fonte is None:
+        print("Nenhum consumo encontrado.")
+        return
+
+    cursor.execute("""
+        SELECT
+            fe.nome,
+            c.mes_ref,
+            c.ano_ref,
+            c.quantidade,
+            fe.unidade,
+            c.tco2_eq
+        FROM historico_consumo c
+        JOIN fontes_emissao fe
+            ON c.fonte_id = fe.id
+        WHERE c.fonte_id = ?
+        AND fe.empresa_id = ?
+        ORDER BY c.ano_ref ASC, c.mes_ref ASC
+    """, (fonte_id, empresa_id))
+
+    registros = cursor.fetchall()
+
+    if len(registros) == 0:
+        print("Nenhum consumo encontrado.")
+        return
+
+    print("\n--- Histórico por Fonte ---")
+
+    for registro in registros:
+
+        nome, mes, ano, quantidade, unidade, tco2_eq = registro
+
+        print(
+            f"Fonte: {nome} | "
+            f"{mes:02d}/{ano} | "
+            f"{quantidade} {unidade} | "
+            f"{tco2_eq} tCO₂e"
+        )
+
+
+def consultar_historico_por_periodo(conn, empresa_id, mes_ref, ano_ref):
+    if ano_ref < 2000:
+        print("Erro: ano deve ser maior ou igual a 2000.")
+        return
+    if mes_ref < 1 or mes_ref > 12:
+        print("Erro: mês deve estar entre 1 e 12.")
+        return
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            fe.nome,
+            c.mes_ref,
+            c.ano_ref,
+            c.quantidade,
+            fe.unidade,
+            c.tco2_eq
+        FROM historico_consumo c
+        JOIN fontes_emissao fe
+            ON c.fonte_id = fe.id
+        WHERE fe.empresa_id = ?
+        AND c.mes_ref = ?
+        AND c.ano_ref = ?
+        ORDER BY fe.nome ASC
+    """, (empresa_id, mes_ref, ano_ref))
+
+    registros = cursor.fetchall()
+
+    if len(registros) == 0:
+        print("Nenhum consumo encontrado neste periodo.")
+        return
+
+    print(f"\n--- Histórico por Período: {mes_ref:02d}/{ano_ref} ---")
+
+    for registro in registros:
+
+        nome, mes, ano, quantidade, unidade, tco2_eq = registro
+
+        print(
+            f"Fonte: {nome} | "
+            f"{mes:02d}/{ano} | "
+            f"{quantidade} {unidade} | "
+            f"{tco2_eq} tCO₂e"
+        )
+
+def relatorio_evolucao(conn, empresa_id):
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT mes_ref, ano_ref, SUM(tco2_eq)
+        FROM historico_consumo
+        WHERE fonte_id IN (
+            SELECT id FROM fontes_emissao WHERE empresa_id = ?
+        )
+        GROUP BY ano_ref, mes_ref
+        ORDER BY ano_ref, mes_ref
+    """, (empresa_id,))
+
+    periodos = cursor.fetchall()
+
+    if len(periodos) == 0:
+        print("Sem dados para gerar relatorio.")
+        return
+
+    print("\n--- RELATORIO DE EVOLUCAO ---")
+
+    anterior = None
+
+    for mes_ref, ano_ref, atual in periodos:
+
+        if anterior is None or anterior == 0:
+            variacao = "—"
+        else:
+            variacao = ((atual - anterior) / anterior) * 100
+            variacao = f"{variacao:.2f}%"
+
+        print(f"Mês: {mes_ref:02d}/{ano_ref}")
+        print(f"Total: {atual:.2f} tCO2e")
+        print(f"Variação: {variacao}")
+        print("-" * 30)
+        anterior = atual
+
+    ultimo_mes = periodos[-1][0]
+    ultimo_ano = periodos[-1][1]
+
+    cursor.execute("""
+        SELECT f.nome, SUM(c.tco2_eq)
+        FROM historico_consumo c
+        JOIN fontes_emissao f ON c.fonte_id = f.id
+        WHERE f.empresa_id = ?
+          AND c.mes_ref = ?
+          AND c.ano_ref = ?
+        GROUP BY c.fonte_id
+        ORDER BY SUM(c.tco2_eq) DESC
+        LIMIT 1
+    """, (empresa_id, ultimo_mes, ultimo_ano))
+
+    resultado = cursor.fetchone()
+
+    if resultado:
+
+       print(f"\nFonte principal em {ultimo_mes:02d}/{ultimo_ano}: {resultado[0]} ({resultado[1]:.2f} tCO2eq)")
+
+
+
+def exportar_csv(conn, empresa_id):
+    cursor = conn.cursor()
+    cursor.execute("SELECT razao_social FROM empresas WHERE id = ?", (empresa_id,))
+    resultado_empresa = cursor.fetchone()
+
+    if resultado_empresa is None:
+        print("Erro: Empresa não encontrada para exportação.")
+        return
+    nome_empresa = resultado_empresa[0]
+    nome_limpo = nome_empresa.replace(" ", "_").replace("/", "_").lower()
+
+    cursor.execute("""
+        SELECT
+            f.nome,
+            f.tipo,
+            c.mes_ref,
+            c.ano_ref,
+            c.quantidade,
+            f.unidade,
+            c.tco2_eq      
+        FROM historico_consumo c
+        JOIN fontes_emissao f
+            ON c.fonte_id = f.id
+        WHERE f.empresa_id = ?
+        ORDER BY c.ano_ref, c.mes_ref, f.nome
+                 """, (empresa_id,))
+    
+    dados = cursor.fetchall()
+
+    if len(dados) == 0:
+        print("Nenhum dado encontrado.")
+        return 
+    
+    nome_arquivo = f"relatorio_empresa_{nome_limpo}.csv"
+    caminho = os.path.join(PASTA_PROJETO,nome_arquivo)
+    with open (caminho, mode = "w" , newline="" , encoding="utf-8-sig") as arquivo:
+        writer = csv.writer(arquivo, delimiter = ";")
+        writer.writerow(["fonte", "tipo", "mes", "ano", "quantidade", "unidade", "tco2_eq"])
+        
+        for linha in dados:
+            writer.writerow(linha)
+
+    print(f"Relatório exportado: {caminho}")
+
+def verificar_alerta_periodo(conn, empresa_id, mes_ref, ano_ref):
+    if ano_ref < 2000:
+        print("Erro: ano deve ser maior ou igual a 2000.")
+        return
+    if mes_ref < 1 or mes_ref > 12:
+        print("Erro: mês deve estar entre 1 e 12.")
+        return
+
+    mes_ant = mes_ref - 1
+    ano_ant = ano_ref
+    if mes_ant == 0:
+        mes_ant = 12
+        ano_ant -= 1
+
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT SUM(c.tco2_eq) FROM historico_consumo c
+        JOIN fontes_emissao f ON c.fonte_id = f.id
+        WHERE f.empresa_id = ? AND c.mes_ref = ? AND c.ano_ref = ?
+    """, (empresa_id, mes_ref, ano_ref))
+    atual = cursor.fetchone()[0]
+    if atual is None:
+        print("Sem dados para o período informado.")
+        return
+    
+    cursor.execute("""
+        SELECT SUM(c.tco2_eq) FROM historico_consumo c
+        JOIN fontes_emissao f ON c.fonte_id = f.id
+        WHERE f.empresa_id = ? AND c.mes_ref = ? AND c.ano_ref = ?
+    """, (empresa_id, mes_ant, ano_ant))
+    anterior = cursor.fetchone()[0]
+    if anterior is None:
+        print("Primeiro período cadastrado ou sem histórico anterior suficiente para alerta.")
+        return
+
+    diferenca = ((atual - anterior) / anterior) * 100
+
+    if diferenca >= 30:
+        print(f"\nATENÇÃO: Alerta de emissões!")
+        print(f"{mes_ref:02d}/{ano_ref} ({atual:.1f} tCO2e) é {diferenca:.1f}% acima de {mes_ant:02d}/{ano_ant} ({anterior:.1f} tCO2e)")
+    else:
+        print(f"Variação dentro do aceitável ({diferenca:.1f}% em relação ao período anterior).")
+
+def menu_relatorios(conn, empresa_id):
+    while True:
+        print("\n----Relatórios----")
+        print("[1] Consultar histórico por fonte")
+        print("[2] Consultar histórico por período")
+        print("[3] Relatório de evolução")
+        print("[4] Exportar CSV")
+        print("[5] Verificar alerta 30%")
+        print("[6] Voltar")
+
+        try:
+            opcao = int(input("\nEscolha: "))
+        except ValueError:
+            print("Opção inválida. Digite apenas números.")
+            continue
+
+        if opcao == 1:
+            listar_fontes(conn, empresa_id)
+            try:
+                fonte_id = int(input("ID da fonte: "))
+                consultar_historico_por_fonte(conn, empresa_id, fonte_id)
+            except ValueError:
+                print("ID inválido.")
+                continue
+
+        elif opcao == 2:
+            try:
+                mes_ref = int(input("Mês de referência: "))
+                ano_ref = int(input("Ano de referência: "))
+                consultar_historico_por_periodo(conn, empresa_id, mes_ref, ano_ref)
+            except ValueError:
+                print("Erro: digite valores numéricos válidos.")
+               
+                continue
+            
+        elif opcao == 3:
+            relatorio_evolucao(conn, empresa_id)
+        elif opcao == 4:
+            exportar_csv(conn, empresa_id)
+        
+        elif opcao == 5:
+            try:
+                mes_ref = int(input("Mês de referência (atual): "))
+                ano_ref = int(input("Ano de referência (atual): "))
+                verificar_alerta_periodo(conn, empresa_id, mes_ref, ano_ref)
+            except ValueError:
+                print("Erro: digite valores numéricos válidos.")
+        
+        elif opcao == 6:
+            break
+        else:
+            print("Opção Inválida.")

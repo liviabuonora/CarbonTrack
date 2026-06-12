@@ -13,7 +13,7 @@ def validar_tipo_fonte(tipo):
 
 def validar_texto(valor, nome_campo):
     if valor == "":
-        print(f"Erro: {nome_campo} não pode ser vazio.")
+        print(f"\033[31mErro:\033[0m {nome_campo} não pode ser vazio.")
         return False
     return True
 
@@ -26,10 +26,10 @@ def validar_formato_cnpj(cnpj):
 
 def validar_quantidade(quantidade):
     if quantidade < 0:
-        print("Erro: quantidade não pode ser negativa.")
+        print("\033[31mErro:\033[0m quantidade não pode ser negativa.")
         return False
     if quantidade == 0:
-        print("Erro: quantidade deve ser maior que zero.")
+        print("\033[31mErro:\033[0m quantidade deve ser maior que zero.")
         return False
     return True
 
@@ -53,7 +53,7 @@ def validar_discrepancia(conn, fonte_id, quantidade):
     media = sum(valores) / len(valores)
     
     if quantidade > media * 5:
-        print(f"Aviso: quantidade {quantidade} é muito acima do histórico recente!")
+        print(f"Aviso:\033[0m quantidade {quantidade} é muito acima do histórico recente!")
         resposta = input("Deseja confirmar mesmo assim? (s/n): ").strip().lower()
         if resposta != "s":
             print("Consumo não registrado.")

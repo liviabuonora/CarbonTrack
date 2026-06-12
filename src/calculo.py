@@ -1,5 +1,3 @@
-import sqlite3
-
 def buscar_fator (conn,tipo_fonte):
     cursor = conn.cursor()
     cursor.execute("SELECT fator_conversao, unidade FROM fatores_emissao WHERE tipo_fonte = ?",(tipo_fonte,))

@@ -1,11 +1,12 @@
 import os
-os.system ("cls")
+os.system ('cls' if os.name == 'nt' else 'clear')
 
 from database import criar_banco, conectar
 from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
 from validacoes import TIPOS_VALIDOS, validar_empresa_existe, validar_formato_cnpj
 from consumo import registrar_consumo, listar_consumos
+from relatorio import menu_relatorios
 
 def menu_fontes(conn, empresa_id):
     while True:
@@ -16,7 +17,8 @@ def menu_fontes(conn, empresa_id):
         print("[4] Desativar fonte")
         print("[5] Registrar consumo")
         print("[6] Listar consumos")
-        print("[7] Voltar")
+        print("[7] Relatórios")
+        print("[8] Voltar")
 
         try:
             opcao = int(input("\nEscolha: "))
@@ -83,16 +85,10 @@ def menu_fontes(conn, empresa_id):
                 ano_ref = int(input("Ano de referência: "))
 
             except ValueError:
-                print("Erro: digite valores numéricos válidos.")
+                print("\033[31mErro:\033[0m digite valores numéricos válidos.")
                 continue
 
-            registrar_consumo(
-                conn,
-                fonte_id,
-                quantidade,
-                mes_ref,
-                ano_ref
-            )
+            registrar_consumo(conn, empresa_id, fonte_id, quantidade, mes_ref, ano_ref)
 
         elif opcao == 6:
 
@@ -104,9 +100,12 @@ def menu_fontes(conn, empresa_id):
                 print("ID inválido.")
                 continue
 
-            listar_consumos(conn, fonte_id)
+            listar_consumos(conn, empresa_id, fonte_id)
 
         elif opcao == 7:
+            menu_relatorios(conn, empresa_id)
+
+        elif opcao == 8:
             break
 
         else:
@@ -130,12 +129,12 @@ def menu_principal(conn):
             continue
         
         if opcao == 1:
-            os.system('cls')
+            os.system('cls' if os.name == 'nt' else 'clear')
             razao_social = input("Razão social: ").strip()
 
             cnpj = input("CNPJ: ").strip()
             while not validar_formato_cnpj(cnpj):
-                print("Erro: São necessarios 14 digitos e deve conter apenas números")
+                print("\033[31mErro:\033[0m São necessarios 14 digitos e deve conter apenas números")
                 cnpj = input("Digite o CNPJ: ")
             setor = input("Setor: ").strip()   
             cadastrar_empresa(conn, razao_social, cnpj, setor)
@@ -151,7 +150,7 @@ def menu_principal(conn):
                 continue  
             
             if not validar_empresa_existe(conn, empresa_id):
-                print(f"Erro: nenhuma empresa encontrada com ID {empresa_id}.")
+                print(f"\033[31mErro:\033[0m nenhuma empresa encontrada com ID {empresa_id}.")
                 continue
             
             menu_fontes(conn, empresa_id)
@@ -166,17 +165,8 @@ def menu_principal(conn):
 
 criar_banco()
 conn = conectar()
-print("Banco iniciado com sucesso.")
+print("\033[32mBanco iniciado com sucesso.\033[0m")
 
 menu_principal(conn)
 
 conn.close()
-
-
-        
-
-
-
-
-
-
