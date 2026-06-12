@@ -35,3 +35,19 @@ def buscar_empresa(conn, empresa_id):
         SELECT id, razao_social, cnpj, setor FROM empresas WHERE id = ? """, (empresa_id,))
     return cursor.fetchone()
 
+def definir_meta(conn, empresa_id, meta):
+    if meta <= 0:
+        print("Erro: a meta deve ser um valor positivo.")
+        return
+    
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM empresas WHERE id = ?", (empresa_id,))
+    if cursor.fetchone() is None:
+        print("Erro: empresa não encontrada.")
+        return
+
+    cursor.execute("""
+        UPDATE empresas SET meta_anual_tco2 = ? WHERE id = ?
+    """, (meta, empresa_id))
+    conn.commit()
+    print(f"Meta anual definida: {meta:.2f} tCO2e")

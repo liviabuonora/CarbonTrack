@@ -2,7 +2,7 @@ import os
 os.system ('cls' if os.name == 'nt' else 'clear')
 
 from database import criar_banco, conectar
-from empresa import cadastrar_empresa, listar_empresas, buscar_empresa
+from empresa import cadastrar_empresa, listar_empresas, buscar_empresa, definir_meta
 from fonte import cadastrar_fonte, listar_fontes, editar_fonte, desativar_fonte
 from validacoes import TIPOS_VALIDOS, validar_empresa_existe, validar_formato_cnpj
 from consumo import registrar_consumo, listar_consumos
@@ -18,7 +18,8 @@ def menu_fontes(conn, empresa_id):
         print("[5] Registrar consumo")
         print("[6] Listar consumos")
         print("[7] Relatórios")
-        print("[8] Voltar")
+        print("[8] Definir meta anual")
+        print("[9] Voltar")
 
         try:
             opcao = int(input("\nEscolha: "))
@@ -106,8 +107,15 @@ def menu_fontes(conn, empresa_id):
             menu_relatorios(conn, empresa_id)
 
         elif opcao == 8:
+            try:
+                meta = float(input("Meta anual de emissões (tCO2e): "))
+            except ValueError:
+                print("Erro: digite um valor numérico válido.")
+                continue
+            definir_meta(conn, empresa_id, meta)
+        
+        elif opcao == 9:
             break
-
         else:
             print("Opção Inválida.")
 
