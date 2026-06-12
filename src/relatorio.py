@@ -250,6 +250,50 @@ def verificar_alerta_periodo(conn, empresa_id, mes_ref, ano_ref):
     else:
         print(f"Variação dentro do aceitável ({diferenca:.1f}% em relação ao período anterior).")
 
+def relatorio_percentual_fontes(conn, empresa_id, mes_ref, ano_ref):
+    if mes_ref < 1 or mes_ref > 12:
+        print("Erro: mês deve estar entre 1 e 12.")
+        return
+    if ano_ref < 2000:
+        print("Erro: ano deve ser maior ou igual a 2000.")
+        return
+    
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT f.nome, SUM(c.tco2_eq)
+        FROM historico_consumo c
+        JOIN fontes_emissao f ON c.fonte_id = f.id
+        WHERE f.empresa_id = ?
+          AND c.mes_ref = ?
+          AND c.ano_ref = ?
+        GROUP BY c.fonte_id
+        ORDER BY SUM(c.tco2_eq) DESC
+    """, (empresa_id, mes_ref, ano_ref))
+    
+    fontes = cursor.fetchall()
+
+    if len(fontes) == 0:
+        print("Nenhum dado para o periodo informado.")
+        return
+    
+    total = 0
+    for fonte in fontes:
+        total += fonte[1]
+
+    if total == 0:
+        print("Total de emissoes no periodo e zero. Nao e possivel calcular percentuais.")
+        return
+    
+    print(f"\n--- PERCENTUAL POR FONTE — {mes_ref:02d}/{ano_ref} ---")
+
+    for fonte in fontes:
+        nome = fonte[0]
+        tco2 = fonte[1]
+        percentual = (tco2 / total) * 100
+        print(f"{nome}: {tco2:.2f} tCO2e ({percentual:.1f}%)")
+
+    print(f"\nTotal do periodo: {total:.2f} tCO2e")
+
 def menu_relatorios(conn, empresa_id):
     while True:
         print("\n----Relatórios----")
@@ -258,7 +302,8 @@ def menu_relatorios(conn, empresa_id):
         print("[3] Relatório de evolução")
         print("[4] Exportar CSV")
         print("[5] Verificar alerta 30%")
-        print("[6] Voltar")
+        print("[6] Percentual por fonte")
+        print("[7] Voltar")
 
         try:
             opcao = int(input("\nEscolha: "))
@@ -299,6 +344,14 @@ def menu_relatorios(conn, empresa_id):
                 print("Erro: digite valores numéricos válidos.")
         
         elif opcao == 6:
+            try:
+                mes_ref = int(input("Mês de referência: "))
+                ano_ref = int(input("Ano de referência: "))
+                relatorio_percentual_fontes(conn, empresa_id, mes_ref, ano_ref)
+            except ValueError:
+                print("Erro: digite valores numéricos válidos.")
+        
+        elif opcao == 7:
             break
         else:
             print("Opção Inválida.")
