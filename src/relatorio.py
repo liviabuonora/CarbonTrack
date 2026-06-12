@@ -2,6 +2,7 @@ import csv
 import os 
 from fonte import listar_fontes
 from alerta import verificar_alerta_periodo
+from datetime import date
 
 PASTA_PROJETO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,7 +20,7 @@ def consultar_historico_por_fonte(conn, empresa_id, fonte_id):
     fonte = cursor.fetchone()
 
     if fonte is None:
-        print("Nenhum consumo encontrado.")
+        print("Fonte não encontrada para esta empresa.")
         return
 
     cursor.execute("""
@@ -125,9 +126,8 @@ def relatorio_evolucao(conn, empresa_id):
         if anterior is None or anterior == 0:
             variacao = "—"
         else:
-            variacao = ((atual - anterior) / anterior) * 100
-            variacao = f"{variacao:.2f}%"
-
+            variacao = f"{((atual - anterior) / anterior) * 100:.2f}%"
+        
         print(f"Mês: {mes_ref:02d}/{ano_ref}")
         print(f"Total: {atual:.2f} tCO2e")
         print(f"Variação: {variacao}")
@@ -186,7 +186,8 @@ def exportar_csv(conn, empresa_id):
         print("Nenhum dado encontrado.")
         return 
     
-    nome_arquivo = f"relatorio_empresa_{nome_limpo}.csv"
+    hoje = date.today().strftime("%Y%m%d")
+    nome_arquivo = f"relatorio_empresa_{nome_limpo}_{hoje}.csv"
     caminho = os.path.join(PASTA_PROJETO,nome_arquivo)
     with open (caminho, mode = "w" , newline="" , encoding="utf-8-sig") as arquivo:
         writer = csv.writer(arquivo, delimiter = ";")
