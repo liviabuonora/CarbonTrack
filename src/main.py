@@ -1,4 +1,3 @@
-import os
 from database import criar_banco, conectar
 from menus import menu_principal
 

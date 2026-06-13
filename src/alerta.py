@@ -34,6 +34,11 @@ def verificar_alerta_periodo(conn, empresa_id, mes_ref, ano_ref):
         print("Primeiro período cadastrado ou sem histórico anterior suficiente para alerta.")
         return
 
+    if anterior == 0:
+        print(f"\nATENÇÃO: O consumo anterior foi zero e o atual é {atual:.1f} tCO2e!")
+        print("Mais atenção para as proximas medições.")
+        return
+    
     diferenca = ((atual - anterior) / anterior) * 100
 
     if diferenca >= 30:
